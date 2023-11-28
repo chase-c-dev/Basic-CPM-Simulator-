@@ -1,0 +1,51 @@
+kernel.c:4.21: error: need ')'
+kernel.c:4.23: error: need variable name
+kernel.c:4.24: error:  not in argument list
+kernel.c:5.19: error: need ')'
+kernel.c:5.21: error: need variable name
+kernel.c:5.22: error:  not in argument list
+kernel.c:6.20: error: need ')'
+kernel.c:6.22: error: need variable name
+kernel.c:6.23: error:  not in argument list
+kernel.c:20.21: error: need ')'
+kernel.c:20.21: error: printString already declared
+kernel.c:20.29: error: chars not in argument list
+kernel.c:20.29: error: need ';'
+kernel.c:20.29: error: need '{'
+kernel.c:20.29: error: bad expression
+kernel.c:21.1: error: need ';'
+kernel.c:32.4: error: bad expression
+kernel.c:32.14: error: need ';'
+kernel.c:32.19: error: bad expression
+kernel.c:32.23: error: c undeclared
+kernel.c:33.1: error: need ';'
+kernel.c:34.14: error: illegal indirection
+kernel.c:62.4: error: bad expression
+kernel.c:62.15: error: need ';'
+kernel.c:62.20: error: bad expression
+kernel.c:62.33: error: inputArray undeclared
+kernel.c:63.1: error: need ';'
+kernel.c:65.21: error: illegal indirection
+kernel.c:69.44: error: illegal indirection
+kernel.c:71.44: error: illegal indirection
+kernel.c:75.15: error: illegal indirection
+kernel.c:75.33: error: invalid lvalue
+kernel.c:76.6: error: bad expression
+kernel.c:76.9: error: need ';'
+kernel.c:76.11: error: al undeclared
+kernel.c:77.6: error: bad expression
+kernel.c:77.9: error: need ';'
+kernel.c:77.11: error: ah undeclared
+kernel.c:78.5: error: bad expression
+kernel.c:78.8: error: need ';'
+kernel.c:78.10: error: ax undeclared
+kernel.c:82.14: error: illegal indirection
+kernel.c:83.18: error: illegal indirection
+kernel.c:91.19: error: compiler bug? - attempting to load non-scalar non-pointer
+kernel.c:eof: error: need '}'
+kernel.c:eof: error: need '{'
+kernel.c:eof: error: need '}'
+kernel.c:eof: error: need '{'
+kernel.c:eof: error: need '}'
+kernel.c:eof: error: need '{'
+kernel.c:eof: error: need '}'
