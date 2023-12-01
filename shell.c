@@ -11,7 +11,6 @@ void dir();
 void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
-void handleTimerInterrupt(int, int);
 
 #define LINE_SIZE 80
 #define SECTOR_SIZE 512
@@ -251,10 +250,4 @@ void argFinder(char* input, char* output, int whichArg)
 	output[outputIndex] = '\0';
 }
 
-void handleTimerInterrupt(int segment, int sp) {
-    syscall(9, "T");
-    syscall(9, "i");
-    syscall(9, "c");
-    returnFromTimer(segment, sp);
-}
 

@@ -12,6 +12,7 @@ void executeProgram(char* name);
 void writeSector(char*, int);
 void deleteFile(char* filename);
 void writeFile(char*, char*, int);
+void handleTimerInterrupt(int, int);
 void terminate();
 
 #define SECTOR_SIZE 512
@@ -20,6 +21,7 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
+    makeTimerInterrupt(); // call in main before launching the shell
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -45,6 +47,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 8: writeFile(bx, cx, dx);
 			break;
+        case 9: printChar(bx);
+            break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -306,6 +310,13 @@ void executeProgram(char* program_name)
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
+}
+
+void handleTimerInterrupt(int segment, int sp) {
+    printChar("T");
+    printChar("i");
+    printChar("c");
+    returnFromTimer(segment, sp);
 }
 
 void terminate()
