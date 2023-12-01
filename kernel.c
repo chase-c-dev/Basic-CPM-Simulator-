@@ -18,9 +18,23 @@ void terminate();
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
 
+int processActive[8]; // at each index contains 1 for active or 0 for not active
+int processStackPointer[8]; // stores processes stack pointer
+int currentProcess; // points to the process the table entry is currently executing
+
 int main()
 {
+    int j = 0;
+
+
 	makeInterrupt21();
+
+    for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
+        processActive[j] = 0;
+        processStackPointer[j] = 0xff00;
+    }
+    currentProcess = -1; // sets current process to -1 because theres no user processes yet
+
     makeTimerInterrupt(); // call in main before launching the shell
 	interrupt(0x21, 4, "shell", 0, 0);
 }
@@ -313,9 +327,9 @@ void executeProgram(char* program_name)
 }
 
 void handleTimerInterrupt(int segment, int sp) {
-    printChar("T");
-    printChar("i");
-    printChar("c");
+    //printChar("T");
+    //printChar("i");
+    //printChar("c");
     returnFromTimer(segment, sp);
 }
 
