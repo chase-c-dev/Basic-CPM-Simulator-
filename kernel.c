@@ -29,13 +29,13 @@ int main()
 
 	makeInterrupt21();
 
-    for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
-        processActive[j] = 0;
-        processStackPointer[j] = 0xff00;
-    }
-    currentProcess = -1; // sets current process to -1 because theres no user processes yet
+	for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
+		processActive[j] = 0;
+		processStackPointer[j] = 0xff00;
+	}
+	currentProcess = -1; // sets current process to -1 because theres no user processes yet
 
-    makeTimerInterrupt(); // call in main before launching the shell
+	makeTimerInterrupt(); // call in main before launching the shell
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -61,8 +61,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 8: writeFile(bx, cx, dx);
 			break;
-        case 9: printChar(bx);
-            break;
+        	case 9: printChar(bx);
+            		break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -326,11 +326,14 @@ void executeProgram(char* program_name)
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
 
-void handleTimerInterrupt(int segment, int sp) {
-    //printChar("T");
-    //printChar("i");
-    //printChar("c");
-    returnFromTimer(segment, sp);
+void handleTimerInterrupt(int segment, int sp)
+{
+	/*
+    	printChar("T");
+    	printChar("i");
+    	printChar("c");
+	// */
+    	returnFromTimer(segment, sp);
 }
 
 void terminate()
