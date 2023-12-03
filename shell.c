@@ -30,7 +30,6 @@ void create(char* filename);
 
 int main()
 {
-	enableInterrupts();
 	while(1) {
 		char userInput[LINE_SIZE];
 		char cmdString[12];
@@ -42,6 +41,8 @@ int main()
 		char* cmdDel = "del";
 		char* cmdCopy = "copy";
 		char* cmdCreate = "create";
+
+		enableInterrupts();
 
 		syscall(0, "\rC> ");
 		syscall(1, userInput);

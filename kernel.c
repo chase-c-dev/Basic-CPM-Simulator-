@@ -336,7 +336,6 @@ void executeProgram(char* program_name)
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
         	// putInMemory(int segment, int address, char character)
          	putInMemory(bufferSegment, offset, buffer[offset]); 
-		// bufferSegment currently (2023-12-02T20:10) breaks the code
     	}
 
 	// Call initilize program
@@ -351,26 +350,46 @@ void executeProgram(char* program_name)
 
 void handleTimerInterrupt(int segment, int sp)
 {
-	int dataseg;
+	int dataseg, processIterator, i;
 
 	dataseg = setKernelDataSegment();
+
+
+	for (i = 0; i < 8; i++) {
+		putInMemory(0xb800, 60 * 2 + i * 4 + 1, 0x30);
+		if (processActive[i] == 1)
+			putInMemory(0xb800, 60 * 2 + i * 4 + 1, 0x20);
+		else
+			putInMemory(0xb800, 60 * 2 + i * 4 + 1, 0);
+	}
+
 	if (currentProcess != -1) {
 		processStackPointer[currentProcess] = sp;
 	}
 
-	printChar("C");
-	printChar("\n");
-	while (currentProcess < 8) {
-		if (processActive[currentProcess] == 1) {
+	processIterator = currentProcess + 1;
+	// This while loop is where the code is broken
+	// It loops forever, never breaking
+	while (processIterator < 8) {
+		if (processActive[processIterator] == 1) {
+			printChar("C");
 			break;
 		}
-		currentProcess++;
-		if (currentProcess == 8)
-			currentProcess = 0;
+
+		if (processIterator == 7) {
+			printChar("k");
+			processIterator = 0;
+		}
+		printChar("U");
+		processIterator++;
 	}
 
+
+	currentProcess = processIterator;
+
 	segment = (currentProcess + 2) * 0x1000;
-	processStackPointer[currentProcess] = sp;
+	sp = processStackPointer[currentProcess];
+	// processStackPointer[currentProcess] = sp;
 
 	restoreDataSegment(dataseg);
 
