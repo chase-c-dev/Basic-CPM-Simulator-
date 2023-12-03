@@ -37,7 +37,6 @@ int main()
 
 	interrupt(0x21, 4, "shell", 0, 0);
 	makeTimerInterrupt(); // call in main before launching the shell
-	while(1);
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -313,24 +312,28 @@ void executeProgram(char* program_name)
 {
     	char buffer[SECTOR_SIZE * MAX_SECTORS];
     	int sectorsRead;
-	int offset = 0, processIterator = 0;
+	int offset = 0;
 	int dataseg;
-	int bufferSegment = 0;
+	int bufferSegment;
+
+	int iterator = 0;
+	int *processIterator = &iterator;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
 	// Step through the process active array looking for a free entry
 	dataseg = setKernelDataSegment();
-	for (processIterator = 0; processIterator < 8; processIterator++) {
-		if (processActive[processIterator] == 0) {
+	for (*processIterator = 0; *processIterator < 8; processIterator++) {
+		if (processActive[*processIterator] == 0) {
+			currentProcess = *processIterator;
 			break;
 		}
 	}
 	restoreDataSegment(dataseg);
 	
 	// Determine the segment (entry num + 2 * 0x1000)
-	bufferSegment = (processIterator + 2) * 0x1000;
+	bufferSegment = (iterator + 2) * 0x1000;
 
 	// Copy the buffer into the segment with putInMemory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
@@ -343,17 +346,17 @@ void executeProgram(char* program_name)
 
 	// Set the processActive for that entry to 1, set the entry's processStack pointer to 0xff00
 	dataseg = setKernelDataSegment();
-	processActive[processIterator] = 1;
-	processStackPointer[processIterator] = 0xff00;
+	processActive[iterator] = 1;
+	processStackPointer[iterator] = 0xff00;
 	restoreDataSegment(dataseg);
 }
 
 void handleTimerInterrupt(int segment, int sp)
 {
 	int dataseg, processIterator, i;
+	int iteratorMax;
 
 	dataseg = setKernelDataSegment();
-
 
 	for (i = 0; i < 8; i++) {
 		putInMemory(0xb800, 60 * 2 + i * 4 + 1, 0x30);
@@ -368,17 +371,18 @@ void handleTimerInterrupt(int segment, int sp)
 	}
 
 	processIterator = currentProcess + 1;
+	iteratorMax = 8 + currentProcess - 1;
+
 	// This while loop is where the code is broken
 	// It loops forever, never breaking
 	while (processIterator < 8) {
 		if (processActive[processIterator] == 1) {
-			printChar("C");
 			break;
 		}
 
 		if (processIterator == 7) {
-			printChar("k");
 			processIterator = 0;
+			printChar("k");
 		}
 		printChar("U");
 		processIterator++;
