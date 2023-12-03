@@ -30,6 +30,7 @@ void create(char* filename);
 
 int main()
 {
+	enableInterrupts();
 	while(1) {
 		char userInput[LINE_SIZE];
 		char cmdString[12];

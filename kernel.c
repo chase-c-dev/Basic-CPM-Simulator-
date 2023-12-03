@@ -29,14 +29,17 @@ int main()
 
 	makeInterrupt21();
 
+	printChar("C");
+	printChar("\n");
 	for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
 		processActive[j] = 0;
 		processStackPointer[j] = 0xff00;
 	}
 	currentProcess = -1; // sets current process to -1 because theres no user processes yet
 
-	makeTimerInterrupt(); // call in main before launching the shell
 	interrupt(0x21, 4, "shell", 0, 0);
+	makeTimerInterrupt(); // call in main before launching the shell
+	while(1);
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -319,7 +322,6 @@ void executeProgram(char* program_name)
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
-	// Put the buffer into memory
 	// Step through the process active array looking for a free entry
 	dataseg = setKernelDataSegment();
 	for (processIterator = 0; processIterator < 8; processIterator++) {
@@ -349,16 +351,34 @@ void executeProgram(char* program_name)
 
 void handleTimerInterrupt(int segment, int sp)
 {
-	/*
-    	printChar("T");
-    	printChar("i");
-    	printChar("c");
-	// */
+	int dataseg;
+
+	dataseg = setKernelDataSegment();
+	if (currentProcess != -1) {
+		processStackPointer[currentProcess] = sp;
+	}
+
+	while (currentProcess < 8) {
+		if (processActive[currentProcess] == 1) {
+			break;
+		}
+		currentProcess++;
+		if (currentProcess == 8)
+			currentProcess = 0;
+	}
+
+	segment = (currentProcess + 2) * 0x1000;
+	processStackPointer[currentProcess] = sp;
+
+	restoreDataSegment(dataseg);
+
     	returnFromTimer(segment, sp);
 }
 
 void terminate()
 {
+	int dataseg;
+	/*
 	char shellname[6];
 	shellname[0] = 's';
 	shellname[1] = 'h';
@@ -368,5 +388,11 @@ void terminate()
 	shellname[5] = '\0';
 
 	executeProgram(shellname);
+	// */
+	dataseg = setKernelDataSegment();
+	processActive[currentProcess] = 0;
+	restoreDataSegment(dataseg);
+	while(1);
+	
 }
 
