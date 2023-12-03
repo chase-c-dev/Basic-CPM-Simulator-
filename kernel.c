@@ -36,7 +36,9 @@ int main()
 	currentProcess = -1; // sets current process to -1 because theres no user processes yet
 
 	interrupt(0x21, 4, "shell", 0, 0);
-	makeTimerInterrupt(); // call in main before launching the shell
+	while(1) {
+		makeTimerInterrupt(); // call in main before launching the shell
+	}
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -316,8 +318,8 @@ void executeProgram(char* program_name)
 	int dataseg;
 	int bufferSegment;
 
-	int iterator = 0;
-	int *processIterator = &iterator;
+	int processloc = 0;
+	int *processIterator = &processloc;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
@@ -333,7 +335,7 @@ void executeProgram(char* program_name)
 	restoreDataSegment(dataseg);
 	
 	// Determine the segment (entry num + 2 * 0x1000)
-	bufferSegment = (iterator + 2) * 0x1000;
+	bufferSegment = (processloc + 2) * 0x1000;
 
 	// Copy the buffer into the segment with putInMemory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
@@ -346,15 +348,14 @@ void executeProgram(char* program_name)
 
 	// Set the processActive for that entry to 1, set the entry's processStack pointer to 0xff00
 	dataseg = setKernelDataSegment();
-	processActive[iterator] = 1;
-	processStackPointer[iterator] = 0xff00;
+	processActive[processloc] = 1;
+	processStackPointer[processloc] = 0xff00;
 	restoreDataSegment(dataseg);
 }
 
 void handleTimerInterrupt(int segment, int sp)
 {
 	int dataseg, processIterator, i;
-	int iteratorMax;
 
 	dataseg = setKernelDataSegment();
 
@@ -371,21 +372,22 @@ void handleTimerInterrupt(int segment, int sp)
 	}
 
 	processIterator = currentProcess + 1;
-	iteratorMax = 8 + currentProcess - 1;
 
 	// This while loop is where the code is broken
 	// It loops forever, never breaking
 	while (processIterator < 8) {
-		if (processActive[processIterator] == 1) {
+		if (processActive[processIterator] == 1)
 			break;
-		}
 
 		if (processIterator == 7) {
 			processIterator = 0;
 			printChar("k");
 		}
-		printChar("U");
-		processIterator++;
+
+		if (processActive[processIterator] == 0) {
+			processIterator++;
+			printChar("u");
+		}
 	}
 
 
@@ -393,7 +395,6 @@ void handleTimerInterrupt(int segment, int sp)
 
 	segment = (currentProcess + 2) * 0x1000;
 	sp = processStackPointer[currentProcess];
-	// processStackPointer[currentProcess] = sp;
 
 	restoreDataSegment(dataseg);
 
