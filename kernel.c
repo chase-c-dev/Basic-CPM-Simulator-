@@ -312,18 +312,39 @@ void executeProgram(char* program_name)
 {
     	char buffer[SECTOR_SIZE * MAX_SECTORS];
     	int sectorsRead;
-	int offset = 0;
+	int offset = 0, processIterator = 0;
+	int dataseg;
+	int bufferSegment;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
 	// Put the buffer into memory
+	// Step through the process active array looking for a free entry
+	dataseg = setKernelDataSegment();
+	for (processIterator = 0; processIterator < 8; processIterator++) {
+		if (processActive[processIterator] == 0) {
+			// Determine the segment (entry num + 2 * 0x1000)
+			bufferSegment = (processIterator + 2) * 0x1000;
+			break;
+		}
+	}
+	restoreDataSegment(dataseg);
+
+	// Copy the buffer into the segment with putInMemory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
         	// putInMemory(int segment, int address, char character)
-         	putInMemory(0x2000, offset, buffer[offset]); 
+         	putInMemory(bufferSegment, offset, buffer[offset]); 
     	}
 
-	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
+	// Call initilize program
+	initializeProgram(bufferSegment);
+
+	// Set the processActive for that entry to 1, set the entry's processStack pointer to 0xff00
+	dataseg = setKernelDataSegment();
+	processActive[processIterator] = 1;
+	processStackPointer[processIterator] = 0xff00;
+	restoreDataSegment(dataseg);
 }
 
 void handleTimerInterrupt(int segment, int sp)
