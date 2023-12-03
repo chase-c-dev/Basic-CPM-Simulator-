@@ -29,8 +29,6 @@ int main()
 
 	makeInterrupt21();
 
-	printChar("C");
-	printChar("\n");
 	for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
 		processActive[j] = 0;
 		processStackPointer[j] = 0xff00;
@@ -317,7 +315,7 @@ void executeProgram(char* program_name)
     	int sectorsRead;
 	int offset = 0, processIterator = 0;
 	int dataseg;
-	int bufferSegment;
+	int bufferSegment = 0;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
@@ -326,17 +324,19 @@ void executeProgram(char* program_name)
 	dataseg = setKernelDataSegment();
 	for (processIterator = 0; processIterator < 8; processIterator++) {
 		if (processActive[processIterator] == 0) {
-			// Determine the segment (entry num + 2 * 0x1000)
-			bufferSegment = (processIterator + 2) * 0x1000;
 			break;
 		}
 	}
 	restoreDataSegment(dataseg);
+	
+	// Determine the segment (entry num + 2 * 0x1000)
+	bufferSegment = (processIterator + 2) * 0x1000;
 
 	// Copy the buffer into the segment with putInMemory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
         	// putInMemory(int segment, int address, char character)
          	putInMemory(bufferSegment, offset, buffer[offset]); 
+		// bufferSegment currently (2023-12-02T20:10) breaks the code
     	}
 
 	// Call initilize program
@@ -358,6 +358,8 @@ void handleTimerInterrupt(int segment, int sp)
 		processStackPointer[currentProcess] = sp;
 	}
 
+	printChar("C");
+	printChar("\n");
 	while (currentProcess < 8) {
 		if (processActive[currentProcess] == 1) {
 			break;
