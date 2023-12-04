@@ -37,7 +37,7 @@ int main()
 
 	interrupt(0x21, 4, "shell", 0, 0);
 	makeTimerInterrupt(); // call in main before launching the shell
-	// while(1);
+	while(1);
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -373,16 +373,15 @@ void handleTimerInterrupt(int segment, int sp)
 	processIterator = currentProcess + 1;
 
 	while (processIterator < 8) {
-		if (processActive[processIterator] == 1)
+		if (processActive[processIterator] == 1) {
 			break;
+		}
 
 		if (processIterator == 7) {
-			//printChar("k");
-			processIterator = 0;
+			processIterator = -1;
 		}
 
 		processIterator++;
-		//printChar("U");
 	}
 
 
