@@ -36,9 +36,8 @@ int main()
 	currentProcess = -1; // sets current process to -1 because theres no user processes yet
 
 	interrupt(0x21, 4, "shell", 0, 0);
-	while(1) {
-		makeTimerInterrupt(); // call in main before launching the shell
-	}
+	makeTimerInterrupt(); // call in main before launching the shell
+	// while(1);
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -194,11 +193,10 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 
 void writeFile(char* buffer, char* filename, int numberOfSectors)
 {
-	// THIS DOES NOT WORK PROPERLY IF YOU DELETE A FILE
-	// IF YOU CLEAR A SECTOR AND THEN THERE ARE UNFREE SECTORS AFTER THAT, IT ASSUMES ALL SECTORS AFTER THE FIRST FREE SECTOR IS FREE
 	char dir[SECTOR_SIZE], map[SECTOR_SIZE], genericSectorBuffer[SECTOR_SIZE];
 	int i, j;
 	int file_entry, directoryColumn, sectorCounter, currentSector, totalSectors;
+
 	// Integer array to store the available sectors
 	int freeSectors[MAX_SECTORS + 5]; // + 5 for good measure
 
@@ -240,7 +238,8 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 	
 	// Write the given buffer into necessary sectors
 	// If there are more than 26 sectors assigned this whole thing will break
-	for (i = 0; i < sectorCounter && sectorCounter < MAX_SECTORS; i++) {
+	// so we have added MAX_SECTORS as an upper limit to break the file instead
+	for (i = 0; i < sectorCounter && i < MAX_SECTORS; i++) {
 		currentSector = freeSectors[i];
 		readSector(genericSectorBuffer, currentSector);
 
@@ -373,21 +372,17 @@ void handleTimerInterrupt(int segment, int sp)
 
 	processIterator = currentProcess + 1;
 
-	// This while loop is where the code is broken
-	// It loops forever, never breaking
 	while (processIterator < 8) {
 		if (processActive[processIterator] == 1)
 			break;
 
 		if (processIterator == 7) {
-			processIterator = 0;
 			printChar("k");
+			processIterator = 0;
 		}
 
-		if (processActive[processIterator] == 0) {
-			processIterator++;
-			printChar("u");
-		}
+		processIterator++;
+		printChar("U");
 	}
 
 
