@@ -29,7 +29,7 @@ int main()
 
 	makeInterrupt21();
 
-	for (j = 0; j < sizeof(processActive); j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
+	for (j = 0; j < 8; j++) { // sets all process actives to 0 on all entries and stack pointer values to 0xff00
 		processActive[j] = 0;
 		processStackPointer[j] = 0xff00;
 	}
@@ -317,7 +317,7 @@ void executeProgram(char* program_name)
 	int dataseg;
 	int bufferSegment;
 
-	int processloc = 0;
+	int processloc;
 	int *processIterator = &processloc;
 
 	// Read program_name into buffer
@@ -325,11 +325,13 @@ void executeProgram(char* program_name)
 
 	// Step through the process active array looking for a free entry
 	dataseg = setKernelDataSegment();
-	for (*processIterator = 0; *processIterator < 8; processIterator++) {
+	while (*processIterator < 8) {
 		if (processActive[*processIterator] == 0) {
-			currentProcess = *processIterator;
+			printChar("i");
 			break;
 		}
+		printChar("A");
+		*processIterator += 1;
 	}
 	restoreDataSegment(dataseg);
 	
@@ -374,6 +376,7 @@ void handleTimerInterrupt(int segment, int sp)
 
 	while (processIterator < 8) {
 		if (processActive[processIterator] == 1) {
+			printChar("M");
 			break;
 		}
 
