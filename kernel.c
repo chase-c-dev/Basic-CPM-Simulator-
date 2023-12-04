@@ -377,12 +377,12 @@ void handleTimerInterrupt(int segment, int sp)
 			break;
 
 		if (processIterator == 7) {
-			printChar("k");
+			//printChar("k");
 			processIterator = 0;
 		}
 
 		processIterator++;
-		printChar("U");
+		//printChar("U");
 	}
 
 
