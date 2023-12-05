@@ -317,26 +317,25 @@ void executeProgram(char* program_name)
 	int dataseg;
 	int bufferSegment;
 
-	int processloc;
-	int *processIterator = &processloc;
+	int processIterator = 0;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
 	// Step through the process active array looking for a free entry
 	dataseg = setKernelDataSegment();
-	while (*processIterator < 8) {
-		if (processActive[*processIterator] == 0) {
+	while (processIterator < 8) {
+		if (processActive[processIterator] == 0) {
 			printChar("i");
 			break;
 		}
 		printChar("A");
-		*processIterator += 1;
+		processIterator += 1;
 	}
 	restoreDataSegment(dataseg);
 	
 	// Determine the segment (entry num + 2 * 0x1000)
-	bufferSegment = (processloc + 2) * 0x1000;
+	bufferSegment = (processIterator + 2) * 0x1000;
 
 	// Copy the buffer into the segment with putInMemory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
@@ -349,8 +348,8 @@ void executeProgram(char* program_name)
 
 	// Set the processActive for that entry to 1, set the entry's processStack pointer to 0xff00
 	dataseg = setKernelDataSegment();
-	processActive[processloc] = 1;
-	processStackPointer[processloc] = 0xff00;
+	processActive[processIterator] = 1;
+	processStackPointer[processIterator] = 0xff00;
 	restoreDataSegment(dataseg);
 }
 
