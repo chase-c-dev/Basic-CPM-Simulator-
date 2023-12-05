@@ -326,10 +326,8 @@ void executeProgram(char* program_name)
 	dataseg = setKernelDataSegment();
 	while (processIterator < 8) {
 		if (processActive[processIterator] == 0) {
-			printChar("i");
 			break;
 		}
-		printChar("A");
 		processIterator += 1;
 	}
 	restoreDataSegment(dataseg);
@@ -375,7 +373,6 @@ void handleTimerInterrupt(int segment, int sp)
 
 	while (processIterator < 8) {
 		if (processActive[processIterator] == 1) {
-			printChar("M");
 			break;
 		}
 
