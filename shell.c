@@ -11,6 +11,7 @@ void dir();
 void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
+void kill(char* pid);
 
 #define LINE_SIZE 80
 #define SECTOR_SIZE 512
@@ -79,7 +80,7 @@ int main()
 		}
         	else if (stringCompare(cmdString, cmdKill)) {
 			argFinder(userInput, arg1, 1);
-			syscall(10, arg1);
+			kill(arg1);
         	}
 		else {
 			syscall(0, "Bad command!\n\r");
@@ -87,6 +88,11 @@ int main()
 		
 	}
 		
+}
+
+void kill(char* pid)
+{
+	syscall(9, pid);
 }
 
 void type(char* inputFileName)

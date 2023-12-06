@@ -13,7 +13,7 @@ void writeSector(char*, int);
 void deleteFile(char* filename);
 void writeFile(char*, char*, int);
 void handleTimerInterrupt(int, int);
-void killProcess(char BX);
+void killProcess(char* BX);
 void terminate();
 
 #define SECTOR_SIZE 512
@@ -63,9 +63,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 8: writeFile(bx, cx, dx);
 			break;
-        	case 9: printChar(bx);
-            		break;
-        	case 10: killProcess(bx);
+        	case 9: killProcess(bx);
             		break;
 		default: printString("Error AX is invalid");
 			break;
@@ -397,13 +395,12 @@ void handleTimerInterrupt(int segment, int sp)
     	returnFromTimer(segment, sp);
 }
 
-void killProcess(char BX)
+void killProcess(char* BX)
 { //BX is the process number
 	int dataseg;
-	int j = 0;    
+	int j = 0, tempBX;
     	char holder[8];
 
-	dataseg = setKernelDataSegment();
     	holder[0] = '0';
     	holder[1] = '1';
     	holder[2] = '2';
@@ -412,11 +409,16 @@ void killProcess(char BX)
     	holder[5] = '5';
     	holder[6] = '6';
     	holder[7] = '7';
+
     	for (j = 0; j < 8; j++){
-        	if (holder[j] == BX) {
-            		processActive[j] = 0;
+        	if (holder[j] == BX[0]) {
+			tempBX = j;
+			break;
 		}
     	} 
+
+	dataseg = setKernelDataSegment();
+	processActive[tempBX] = 0;
 	restoreDataSegment(dataseg);
 }
 
