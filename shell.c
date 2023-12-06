@@ -28,6 +28,8 @@ void create(char* filename);
  * 8, writeFile
  */
 
+int currentPID;
+
 int main()
 {
 	while(1) {
@@ -108,7 +110,7 @@ void exec(char* inputFileName)
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
 	if (sectorsRead > 0)
-		syscall(4, inputFileName);
+		currentPID = syscall(4, inputFileName);
 	else
 		syscall(0, "File not found.\r\n");
 }
@@ -185,6 +187,7 @@ void create(char* filename)
 	int sectorIndex = 0;
 	int i;
 
+	syscall(10, currentPID);
 	// We need to continue reading a line until the user doesn't enter anything
 	while (1) {
 		syscall(1, stringStore);

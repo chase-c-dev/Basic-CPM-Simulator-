@@ -8,19 +8,22 @@ void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
-void executeProgram(char* name);
+
+int executeProgram(char* name);
+
 void writeSector(char*, int);
 void deleteFile(char* filename);
 void writeFile(char*, char*, int);
 void handleTimerInterrupt(int, int);
 void killProcess(char*);
+void wait(int pid);
 void terminate();
 
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
-
 int processActive[8]; // at each index contains 1 for active or 0 for not active
 int processStackPointer[8]; // stores processes stack pointer
+int processWaitingOn[8]; // Stores waiting process ids
 int currentProcess; // points to the process the table entry is currently executing
 
 int main()
@@ -65,6 +68,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
         	case 9: killProcess(bx);
             		break;
+		case 10: wait(bx);
+			 break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -310,7 +315,7 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename
 	return 0;
 }
 
-void executeProgram(char* program_name)
+int executeProgram(char* program_name)
 {
     	char buffer[SECTOR_SIZE * MAX_SECTORS];
     	int sectorsRead;
@@ -350,6 +355,8 @@ void executeProgram(char* program_name)
 	processActive[processIterator] = 1;
 	processStackPointer[processIterator] = 0xff00;
 	restoreDataSegment(dataseg);
+	
+	return processIterator;
 }
 
 void handleTimerInterrupt(int segment, int sp)
@@ -396,28 +403,74 @@ void handleTimerInterrupt(int segment, int sp)
 }
 
 void killProcess(char* BX){ //BX is the process number
-    	int dataseg, j = 0, tempBX;
-    	char holder[8];
+    	int dataseg, intBX, i;
 
-    	holder[0] = '0';
-    	holder[1] = '1';
-    	holder[2] = '2';
-    	holder[3] = '3';
-    	holder[4] = '4';
-    	holder[5] = '5';
-    	holder[6] = '6';
-    	holder[7] = '7';
-  
-    	for (j = 0; j < 8; j++){
-       		if (holder[j] == BX[0]) {
-			tempBX = j;
-			break;
-      		}
-    	}   
+	switch(BX[0])
+	{
+		case '0': intBX = 0;
+			  break;
+		case '1': intBX = 1;
+			  break;
+		case '2': intBX = 2;
+			  break;
+		case '3': intBX = 3;
+			  break;
+		case '4': intBX = 4;
+			  break;
+		case '5': intBX = 5;
+			  break;
+		case '6': intBX = 6;
+			  break;
+		case '7': intBX = 7;
+			  break;
+	
+	}
+
         dataseg = setKernelDataSegment();
-        processActive[tempBX] = 0;
+        processActive[intBX] = 0;
+	for (i = 0; i < 8; i++) {
+		if (processWaitingOn[i] == intBX){
+			processWaitingOn[i] = 0;
+			processActive[i] = 1;
+		}
+	}
+	
         restoreDataSegment(dataseg);
  
+}
+
+void wait(int pid)
+{
+	int dataseg;
+
+	/*
+	int intBX;
+	switch(BX[0])
+	{
+		case '0': intBX = 0;
+			  break;
+		case '1': intBX = 1;
+			  break;
+		case '2': intBX = 2;
+			  break;
+		case '3': intBX = 3;
+			  break;
+		case '4': intBX = 4;
+			  break;
+		case '5': intBX = 5;
+			  break;
+		case '6': intBX = 6;
+			  break;
+		case '7': intBX = 7;
+			  break;
+	
+	}
+	*/
+
+        dataseg = setKernelDataSegment();
+	processWaitingOn[currentProcess] = pid;
+	processActive[currentProcess] = 2;
+        restoreDataSegment(dataseg);
 }
 
 void terminate()
