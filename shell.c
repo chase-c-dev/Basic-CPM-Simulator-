@@ -79,7 +79,7 @@ int main()
 		}
         	else if (stringCompare(cmdString, cmdKill)) {
 			argFinder(userInput, arg1, 1);
-			syscall(10, arg1);
+			syscall(9, arg1);
         	}
 		else {
 			syscall(0, "Bad command!\n\r");

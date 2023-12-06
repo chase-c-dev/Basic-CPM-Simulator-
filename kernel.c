@@ -63,10 +63,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 8: writeFile(bx, cx, dx);
 			break;
-        	case 9: printChar(bx);
+        	case 9: killProcess(bx);
             		break;
-        case 10: killProcess(bx);
-            break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -398,26 +396,28 @@ void handleTimerInterrupt(int segment, int sp)
 }
 
 void killProcess(char* BX){ //BX is the process number
-    int j = 0;   
-    int i = 0;
-    int dataseg;
-    char holder[8];
-    holder[0] = '0';
-    holder[1] = '1';
-    holder[2] = '2';
-    holder[3] = '3';
-    holder[4] = '4';
-    holder[5] = '5';
-    holder[6] = '6';
-    holder[7] = '7';
+    	int dataseg, j = 0, tempBX;
+    	char holder[8];
+
+    	holder[0] = '0';
+    	holder[1] = '1';
+    	holder[2] = '2';
+    	holder[3] = '3';
+    	holder[4] = '4';
+    	holder[5] = '5';
+    	holder[6] = '6';
+    	holder[7] = '7';
   
-    for (j = 0; j < 8; j++){
-       if (BX == holder[j]) {
-           dataseg = setKernelDataSegment();
-           processActive[1] = 0;
-           restoreDataSegment(dataseg);
-       }
-    }   
+    	for (j = 0; j < 8; j++){
+       		if (holder[j] == BX[0]) {
+			tempBX = j;
+			break;
+      		}
+    	}   
+        dataseg = setKernelDataSegment();
+        processActive[tempBX] = 0;
+        restoreDataSegment(dataseg);
+ 
 }
 
 void terminate()
