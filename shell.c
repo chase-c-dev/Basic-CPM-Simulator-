@@ -41,7 +41,7 @@ int main()
 		char* cmdDel = "del";
 		char* cmdCopy = "copy";
 		char* cmdCreate = "create";
-        char* cmdKill = "kill";
+        	char* cmdKill = "kill";
 
 		enableInterrupts();
 
@@ -77,10 +77,10 @@ int main()
 			argFinder(userInput, arg1, 1);
 			create(arg1);
 		}
-        else if (stringCompare(cmdString, cmdKill)) {
-            argFinder(userInput, arg1, 1);
-            syscall(10, arg1);
-        }
+        	else if (stringCompare(cmdString, cmdKill)) {
+			argFinder(userInput, arg1, 1);
+			syscall(10, arg1);
+        	}
 		else {
 			syscall(0, "Bad command!\n\r");
 		}
