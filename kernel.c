@@ -398,7 +398,9 @@ void handleTimerInterrupt(int segment, int sp)
 }
 
 void killProcess(char* BX){ //BX is the process number
-    int j = 0;    
+    int j = 0;   
+    int i = 0;
+    int dataseg;
     char holder[8];
     holder[0] = '0';
     holder[1] = '1';
@@ -408,11 +410,14 @@ void killProcess(char* BX){ //BX is the process number
     holder[5] = '5';
     holder[6] = '6';
     holder[7] = '7';
+  
     for (j = 0; j < 8; j++){
-        if (BX = holder[j]) {
-            processActive[j] = 0;
-        }
-    } 
+       if (BX == holder[j]) {
+           dataseg = setKernelDataSegment();
+           processActive[1] = 0;
+           restoreDataSegment(dataseg);
+       }
+    }   
 }
 
 void terminate()
