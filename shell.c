@@ -187,7 +187,9 @@ void create(char* filename)
 	int sectorIndex = 0;
 	int i;
 
+	syscall(0, "\n\rCreate\n\r");
 	syscall(10, currentPID);
+	syscall(0, "\n\rCreate\n\r");
 	// We need to continue reading a line until the user doesn't enter anything
 	while (1) {
 		syscall(1, stringStore);
@@ -211,6 +213,7 @@ void create(char* filename)
 			sectorNumber++;
 	}
 	syscall(8, buffer, filename, sectorNumber);
+	//syscall(5);
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing

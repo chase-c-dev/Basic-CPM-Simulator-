@@ -2,7 +2,7 @@
  * Date: October 2023 */
 
 void printString(char*);
-void printChar(char*);
+void printChar(char inputChar);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
@@ -16,11 +16,12 @@ void deleteFile(char* filename);
 void writeFile(char*, char*, int);
 void handleTimerInterrupt(int, int);
 void killProcess(char*);
-void wait(int pid);
+void wait(char *pid);
 void terminate();
 
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
+
 int processActive[8]; // at each index contains 1 for active or 0 for not active
 int processStackPointer[8]; // stores processes stack pointer
 int processWaitingOn[8]; // Stores waiting process ids
@@ -87,9 +88,9 @@ void printString(char* chars)
 	}
 }
 
-void printChar(char* inputChar)
+void printChar(char inputChar)
 {
-	char al = inputChar[0];
+	char al = inputChar;
 	char ah = 0xe;
 	int ax = ah * 256 + al;
 	interrupt(0x10, ax, 0, 0, 0);
@@ -404,6 +405,8 @@ void handleTimerInterrupt(int segment, int sp)
 
 void killProcess(char* BX){ //BX is the process number
     	int dataseg, intBX, i;
+	printChar('K');
+	printChar('\n');
 
 	switch(BX[0])
 	{
@@ -428,6 +431,7 @@ void killProcess(char* BX){ //BX is the process number
 
         dataseg = setKernelDataSegment();
         processActive[intBX] = 0;
+	// Every time terminate is called, set the process waiting on currentProcess to no longer wait
 	for (i = 0; i < 8; i++) {
 		if (processWaitingOn[i] == intBX){
 			processWaitingOn[i] = 0;
@@ -439,13 +443,28 @@ void killProcess(char* BX){ //BX is the process number
  
 }
 
-void wait(int pid)
+void wait(char* pid)
 {
-	int dataseg;
+	// I think the switch statement might be what breaks the code here. But notably, prinChar doesn't work here either
+	int dataseg, intBX = 0, i;
 
+	char holder[8];
+	holder[0] = '0';
+	holder[1] = '1';
+	holder[2] = '2';
+	holder[3] = '3';
+	holder[4] = '4';
+	holder[5] = '5';
+	holder[6] = '6';
+	holder[7] = '7';
+	for (i = 0; i < 8; i++) {
+		if (holder[i] == pid[0]) {
+			intBX = i;
+		}
+	}
+	// This switch statement doesn't work at all.
 	/*
-	int intBX;
-	switch(BX[0])
+	switch(pid[0])
 	{
 		case '0': intBX = 0;
 			  break;
@@ -467,15 +486,23 @@ void wait(int pid)
 	}
 	*/
 
+
+	printChar('Q');
         dataseg = setKernelDataSegment();
-	processWaitingOn[currentProcess] = pid;
+	processWaitingOn[currentProcess] = intBX;
 	processActive[currentProcess] = 2;
+	printChar('\n');
+	printChar('\r');
+	printChar(currentProcess + '0');
+	printChar('\n');
+	printChar('\r');
+	printChar(intBX + '0');
         restoreDataSegment(dataseg);
 }
 
 void terminate()
 {
-	int dataseg;
+	int dataseg, i;
 	/*
 	char shellname[6];
 	shellname[0] = 's';
@@ -489,6 +516,14 @@ void terminate()
 	// */
 	dataseg = setKernelDataSegment();
 	processActive[currentProcess] = 0;
+	
+	// Every time terminate is called, set the process waiting on currentProcess to no longer wait
+	for (i = 0; i < 8; i++) {
+		if (processWaitingOn[i] == currentProcess){
+			processWaitingOn[i] = 0;
+			processActive[i] = 1;
+		}
+	}
 	restoreDataSegment(dataseg);
 	while(1);
 	
