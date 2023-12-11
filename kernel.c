@@ -405,8 +405,6 @@ void handleTimerInterrupt(int segment, int sp)
 
 void killProcess(char* BX){ //BX is the process number
     	int dataseg, intBX, i;
-	printChar('K');
-	printChar('\n');
 
 	switch(BX[0])
 	{
@@ -426,7 +424,6 @@ void killProcess(char* BX){ //BX is the process number
 			  break;
 		case '7': intBX = 7;
 			  break;
-	
 	}
 
         dataseg = setKernelDataSegment();
@@ -446,24 +443,9 @@ void killProcess(char* BX){ //BX is the process number
 void wait(char* pid)
 {
 	// I think the switch statement might be what breaks the code here. But notably, prinChar doesn't work here either
-	int dataseg, intBX = 0, i;
+	int dataseg, intBX = 0;
 
-	char holder[8];
-	holder[0] = '0';
-	holder[1] = '1';
-	holder[2] = '2';
-	holder[3] = '3';
-	holder[4] = '4';
-	holder[5] = '5';
-	holder[6] = '6';
-	holder[7] = '7';
-	for (i = 0; i < 8; i++) {
-		if (holder[i] == pid[0]) {
-			intBX = i;
-		}
-	}
 	// This switch statement doesn't work at all.
-	/*
 	switch(pid[0])
 	{
 		case '0': intBX = 0;
@@ -482,21 +464,11 @@ void wait(char* pid)
 			  break;
 		case '7': intBX = 7;
 			  break;
-	
 	}
-	*/
 
-
-	printChar('Q');
         dataseg = setKernelDataSegment();
-	processWaitingOn[currentProcess] = intBX;
 	processActive[currentProcess] = 2;
-	printChar('\n');
-	printChar('\r');
-	printChar(currentProcess + '0');
-	printChar('\n');
-	printChar('\r');
-	printChar(intBX + '0');
+	processWaitingOn[currentProcess] = intBX;
         restoreDataSegment(dataseg);
 }
 
@@ -526,6 +498,5 @@ void terminate()
 	}
 	restoreDataSegment(dataseg);
 	while(1);
-	
 }
 

@@ -109,10 +109,13 @@ void exec(char* inputFileName)
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
-	if (sectorsRead > 0)
+	if (sectorsRead > 0) {
 		currentPID = syscall(4, inputFileName);
+		syscall(10, currentPID);
+	}
 	else
 		syscall(0, "File not found.\r\n");
+
 }
 
 void dir()
@@ -187,9 +190,6 @@ void create(char* filename)
 	int sectorIndex = 0;
 	int i;
 
-	syscall(0, "\n\rCreate\n\r");
-	syscall(10, currentPID);
-	syscall(0, "\n\rCreate\n\r");
 	// We need to continue reading a line until the user doesn't enter anything
 	while (1) {
 		syscall(1, stringStore);
