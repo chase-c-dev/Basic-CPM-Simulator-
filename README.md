@@ -5,9 +5,12 @@ All Steps Are Completed (Except 7)
 COMMANDS:
 
 - exec: will continuously print out number in the shell
+
 	Usage - "exec number"
 - kill: terminates a process
+
 	Usage - "kill 3" (terminates process 3)
+
 
 To verify the code
   ./compileOS
