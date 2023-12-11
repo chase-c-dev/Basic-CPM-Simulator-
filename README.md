@@ -13,9 +13,13 @@ COMMANDS:
 
 
 To verify the code
+  
   ./compileOS
+  
   java -jar simulator.jar
+  
   Run/Test the commands above
+
 
 And use the disk.img as disk c
 In the booted terminal ("C>")
