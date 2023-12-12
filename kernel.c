@@ -18,6 +18,7 @@ void handleTimerInterrupt(int, int);
 void killProcess(char*);
 void wait(char *pid);
 void terminate();
+int intPID(char* pid);
 
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
@@ -406,25 +407,8 @@ void handleTimerInterrupt(int segment, int sp)
 void killProcess(char* BX){ //BX is the process number
     	int dataseg, intBX, i;
 
-	switch(BX[0])
-	{
-		case '0': intBX = 0;
-			  break;
-		case '1': intBX = 1;
-			  break;
-		case '2': intBX = 2;
-			  break;
-		case '3': intBX = 3;
-			  break;
-		case '4': intBX = 4;
-			  break;
-		case '5': intBX = 5;
-			  break;
-		case '6': intBX = 6;
-			  break;
-		case '7': intBX = 7;
-			  break;
-	}
+	// Convert char* to int, only works from 0-7 with this
+	intBX = intPID(BX);
 
         dataseg = setKernelDataSegment();
         processActive[intBX] = 0;
@@ -443,29 +427,12 @@ void killProcess(char* BX){ //BX is the process number
 void wait(char* pid)
 {
 	// I think the switch statement might be what breaks the code here. But notably, prinChar doesn't work here either
-	int dataseg, intBX = 0;
+	int dataseg, intBX;
+
+	// Convert char* to int, only works from 0-7 with this
+	intBX = intPID(pid);
 
 	// This switch statement doesn't work at all.
-	switch(pid[0])
-	{
-		case '0': intBX = 0;
-			  break;
-		case '1': intBX = 1;
-			  break;
-		case '2': intBX = 2;
-			  break;
-		case '3': intBX = 3;
-			  break;
-		case '4': intBX = 4;
-			  break;
-		case '5': intBX = 5;
-			  break;
-		case '6': intBX = 6;
-			  break;
-		case '7': intBX = 7;
-			  break;
-	}
-
         dataseg = setKernelDataSegment();
 	processActive[currentProcess] = 2;
 	processWaitingOn[currentProcess] = intBX;
@@ -475,24 +442,14 @@ void wait(char* pid)
 void terminate()
 {
 	int dataseg, i;
-	/*
-	char shellname[6];
-	shellname[0] = 's';
-	shellname[1] = 'h';
-	shellname[2] = 'e';
-	shellname[3] = 'l';
-	shellname[4] = 'l';
-	shellname[5] = '\0';
 
-	executeProgram(shellname);
-	// */
 	dataseg = setKernelDataSegment();
 	processActive[currentProcess] = 0;
 	
 	// Every time terminate is called, set the process waiting on currentProcess to no longer wait
 	for (i = 0; i < 8; i++) {
 		if (processWaitingOn[i] == currentProcess){
-			processWaitingOn[i] = 0;
+			processWaitingOn[i] = '\0';
 			processActive[i] = 1;
 		}
 	}
@@ -500,3 +457,34 @@ void terminate()
 	while(1);
 }
 
+int intPID(char* pid)
+{
+	int intPID;
+	/*
+	 * Yes, I know I can do 
+	 * pid[0] - '0'
+	 * This is the first way we did it and I want that represented in the code.
+	 * Unless of course this breaks it...
+	 */
+	switch(pid[0])
+	{
+		case '0': intPID = 0;
+			  break;
+		case '1': intPID = 1;
+			  break;
+		case '2': intPID = 2;
+			  break;
+		case '3': intPID = 3;
+			  break;
+		case '4': intPID = 4;
+			  break;
+		case '5': intPID = 5;
+			  break;
+		case '6': intPID = 6;
+			  break;
+		case '7': intPID = 7;
+			  break;
+	}
+
+	return intPID;
+}
