@@ -1,9 +1,9 @@
 /* Program to run the shell
- * Step 4 of Project C
  * Nicholas Young & Chase Simao
  */
 void type(char* inputFileName);
 void exec(char* inputFileName);
+void execb(char* inputFileName);
 int stringCompare(char* given, char* compared_to);
 void argFinder(char*, char*, int);
 void numOfArgs(char*, int*);
@@ -40,6 +40,7 @@ int main()
 
 		char* cmdType = "type";
 		char* cmdExec = "exec";
+		char* cmdExecB = "bexec";
 		char* cmdDir = "dir";
 		char* cmdDel = "del";
 		char* cmdCopy = "copy";
@@ -88,6 +89,15 @@ int main()
 		else if (stringCompare(cmdString, cmdHelp)) {
 			help();
 		}
+		// Our usage of argFinder makes "execb" not work, use "bexec" instead
+		else if (stringCompare(cmdString, cmdExecB)) {
+			argFinder(userInput, arg1, 1);
+			execb(arg1);
+		}
+		else if (stringCompare(cmdString, cmdKill)) {
+			argFinder(userInput, arg1, 1);
+			syscall(9, arg1);
+		}
 		else {
 			syscall(0, "Bad command!\n\r");
 		}
@@ -98,7 +108,7 @@ int main()
 
 void help()
 {
-	syscall(0, "Available commands:\n\r\tdir\n\r\tdel\n\r\tcopy\n\r\tcreate\n\r\tkill\n\r\texec\n\r\ttype\n\r\thelp\n\r");
+	syscall(0, "Available commands:\n\r\tdir\n\r\tdel\n\r\tcopy\n\r\tcreate\n\r\tkill\n\r\texec\n\r\ttype\n\r\texecb\n\r\thelp\n\r");
 }
 
 void type(char* inputFileName)
@@ -128,6 +138,19 @@ void exec(char* inputFileName)
 
 }
 
+void execb(char* inputFileName)
+{
+	char buffer[SECTOR_SIZE * MAX_SECTORS]; /*this is the maximum size of a file*/
+	int sectorsRead;
+	syscall(3, inputFileName, buffer, &sectorsRead);
+
+	if (sectorsRead > 0)
+		syscall(4, inputFileName);
+	else
+		syscall(0, "File not found.\r\n");
+
+}
+
 void dir()
 {
 	char directory_buffer[SECTOR_SIZE], file_buffer[12];
@@ -149,14 +172,9 @@ void dir()
 			 */
 			while (directory_buffer[file_entry + i] != '\0') {
 				file_size += SECTOR_SIZE;
-				//syscall(0, "H");
 				i++;
 			}
-			//syscall(0, "\n\r");
-			// */
 			syscall(0, file_buffer);
-			//syscall(0, "\t");
-			//syscall(0, 30);
 			syscall(0, "\n\r");
 			i = 0;
 		}

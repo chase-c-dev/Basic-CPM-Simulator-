@@ -405,21 +405,19 @@ void handleTimerInterrupt(int segment, int sp)
 }
 
 void killProcess(char* BX){ //BX is the process number
-    	int dataseg, intBX, i;
+    	int dataseg, i, intBX;
 
 	// Convert char* to int, only works from 0-7 with this
 	intBX = intPID(BX);
 
         dataseg = setKernelDataSegment();
-        processActive[intBX] = 0;
-	// Every time terminate is called, set the process waiting on currentProcess to no longer wait
+	processActive[intBX] = 0;
 	for (i = 0; i < 8; i++) {
-		if (processWaitingOn[i] == intBX){
-			processWaitingOn[i] = 0;
+		if (processWaitingOn[i] == currentProcess){
+			processWaitingOn[i] = '\0';
 			processActive[i] = 1;
 		}
 	}
-	
         restoreDataSegment(dataseg);
  
 }
