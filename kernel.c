@@ -405,8 +405,32 @@ void handleTimerInterrupt(int segment, int sp)
 }
 
 void killProcess(char* BX){ //BX is the process number
-    	int dataseg, i, intBX;
+    	int dataseg, j = 0, tempBX;
+    	char holder[8];
 
+    	holder[0] = '0';
+    	holder[1] = '1';
+    	holder[2] = '2';
+    	holder[3] = '3';
+    	holder[4] = '4';
+    	holder[5] = '5';
+    	holder[6] = '6';
+    	holder[7] = '7';
+  
+    	for (j = 0; j < 8; j++){
+       		if (holder[j] == BX[0]) {
+			tempBX = j;
+			break;
+      		}
+    	}   
+        dataseg = setKernelDataSegment();
+        processActive[tempBX] = 0;
+        restoreDataSegment(dataseg);
+ 
+}
+
+/*
+void nothing():
 	// Convert char* to int, only works from 0-7 with this
 	intBX = intPID(BX);
 
@@ -421,6 +445,7 @@ void killProcess(char* BX){ //BX is the process number
         restoreDataSegment(dataseg);
  
 }
+*/
 
 void wait(char* pid)
 {
