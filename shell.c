@@ -11,6 +11,7 @@ void dir();
 void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
+void help();
 
 #define LINE_SIZE 80
 #define SECTOR_SIZE 512
@@ -44,6 +45,7 @@ int main()
 		char* cmdCopy = "copy";
 		char* cmdCreate = "create";
         	char* cmdKill = "kill";
+		char* cmdHelp = "help";
 
 		enableInterrupts();
 
@@ -83,12 +85,20 @@ int main()
 			argFinder(userInput, arg1, 1);
 			syscall(9, arg1);
         	}
+		else if (stringCompare(cmdString, cmdHelp)) {
+			help();
+		}
 		else {
 			syscall(0, "Bad command!\n\r");
 		}
 		
 	}
 		
+}
+
+void help()
+{
+	syscall(0, "Available commands:\n\r\tdir\n\r\tdel\n\r\tcopy\n\r\tcreate\n\r\tkill\n\r\texec\n\r\ttype\n\r\thelp\n\r");
 }
 
 void type(char* inputFileName)

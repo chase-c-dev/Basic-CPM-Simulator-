@@ -426,16 +426,11 @@ void killProcess(char* BX){ //BX is the process number
 
 void wait(char* pid)
 {
-	// I think the switch statement might be what breaks the code here. But notably, prinChar doesn't work here either
-	int dataseg, intBX;
+	int dataseg;
 
-	// Convert char* to int, only works from 0-7 with this
-	intBX = intPID(pid);
-
-	// This switch statement doesn't work at all.
         dataseg = setKernelDataSegment();
 	processActive[currentProcess] = 2;
-	processWaitingOn[currentProcess] = intBX;
+	processWaitingOn[currentProcess] = intPID(pid);
         restoreDataSegment(dataseg);
 }
 
@@ -460,13 +455,14 @@ void terminate()
 int intPID(char* pid)
 {
 	int intPID;
+	intPID = pid[3] - '0';
+	return intPID;
 	/*
 	 * Yes, I know I can do 
 	 * pid[0] - '0'
 	 * This is the first way we did it and I want that represented in the code.
 	 * Unless of course this breaks it...
-	 */
-	switch(pid[0])
+	switch(pid[3])
 	{
 		case '0': intPID = 0;
 			  break;
@@ -485,6 +481,5 @@ int intPID(char* pid)
 		case '7': intPID = 7;
 			  break;
 	}
-
-	return intPID;
+	*/
 }
