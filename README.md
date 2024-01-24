@@ -1,4 +1,6 @@
 Project is a bootable shell program that reads files into memory and executes programs.
+Worked on it in a group with https://github.com/AmbivalentLeather.
+Runs in a terminal through a java simulator.
 
 COMMANDS:
 
