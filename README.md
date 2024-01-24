@@ -1,7 +1,5 @@
 Project is a bootable shell program that reads files into memory and executes programs.
 
-All Steps Are Completed (Except 7)
-
 COMMANDS:
 
 - exec: will continuously print out number in the shell
