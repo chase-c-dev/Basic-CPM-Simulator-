@@ -13,10 +13,14 @@ COMMANDS:
 
 MORE COMMANDS:
 	type: Type out the contents of a file Usage - "type filename"
-	copy: Copy a file into another file Usage - "copy filename1 filename2"
-	create: Create a new file Usage - "create filename"
-	dir: List the available files Usage - "dir"
-	del: Delete a file Usage - "delete filename"
+	
+ 	copy: Copy a file into another file Usage - "copy filename1 filename2"
+	
+ 	create: Create a new file Usage - "create filename"
+	
+ 	dir: List the available files Usage - "dir"
+	
+ 	del: Delete a file Usage - "delete filename"
 
 
 To verify the code
